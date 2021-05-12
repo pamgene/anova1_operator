@@ -4,5 +4,15 @@
   "tags": ["statistical testing", "test", "linear model"],
   "authors": ["tercen"],
   "urls": ["https://github.com/tercen/anova1_operator"],
-  "properties": []
+  "properties": [
+  {
+    "kind": "EnumeratedProperty",
+    "name": "Grouping Variable",
+    "defaultValue": "categorical",
+    "description": "Type of the grouping variable",
+	  "values": [
+      "categorical",
+      "contineous"
+      ]
+  } ]
 }
