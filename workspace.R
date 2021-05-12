@@ -8,39 +8,43 @@ library(dplyr)
 #options("tercen.username"= "admin")
 #options("tercen.password"= "admin")
 
-do.anova = function(df){
-  f.stat = NaN
-  numdf = NaN
-  dendf = NaN
-  p.value = NaN
-  r.squared = NaN
-  adj.r.squared = NaN
+do.anova = function(df, grouping_variable){
+  result   <- NULL
+  pFactor1 <- NaN
   aLm = try(lm(.y ~ .group.colors, data=df), silent = TRUE)
   if(!inherits(aLm, 'try-error')) {
-    p.value = (anova(aLm)$'Pr(>F)')[[1]]
-    sm <- summary(aLm)
-    f.stat <- sm$fstatistic[1]
-    numdf <- sm$fstatistic[2]
-    dendf <- sm$fstatistic[3]
-    r.squared <- sm$r.squared
-    adj.r.squared <- sm$adj.r.squared
-  } 
-  return (data.frame(.ri = df$.ri[1], .ci = df$.ci[1],
-                     f.stat = c(f.stat),
-                     numdf = c(numdf),
-                     dendf = c(dendf),
-                     p.value = c(p.value),
-                     r.squared = c(r.squared),
-                     adj.r.squared = c(adj.r.squared)))
+    pFactor1 <- (anova(aLm)$'Pr(>F)')[[1]]
+  }
+  
+  if (is.numeric(df$.group.colors)){
+    slope     <- as.vector(coefficients(aLm))[2]
+    intercept <- as.vector(coefficients(aLm))[1]
+    result <- data.frame(.ri = df$.ri[1], .ci = df$.ci[1], pFactor1 = pFactor1, logPfactor1 = -log10(pFactor1), slope = slope, intercept = intercept)
+  } else {
+    result <- data.frame(.ri = df$.ri[1], .ci = df$.ci[1], pFactor1 = pFactor1, logPfactor1 = -log10(pFactor1))
+  }
+  result
 }
 
 ctx = tercenCtx()
 
-if (length(ctx$colors) < 1) stop("A color factor is required.")
+if (length(ctx$colors) != 1) stop("Grouping for ANOVA1 must be defined using exactly one data color.")
 
-ctx %>% 
+groupingType = ifelse(is.null(ctx$op.value('Grouping Variable')), 'categorical', ctx$op.value('Grouping Variable'))
+
+data <- ctx %>% 
   select(.ci, .ri, .y) %>%
-  mutate(.group.colors = do.call(function(...) paste(..., sep='.'), ctx$select(ctx$colors))) %>%
+  mutate(.group.colors = do.call(function(...) paste(..., sep='.'), ctx$select(ctx$colors)))
+
+  if (groupingType == 'categorical'){
+    data <- data %>% mutate(.group.colors = as.factor(.group.colors))
+  } else {
+    if (!is.numeric(data %>% pull(.group.colors))){
+      stop("Grouping data can not be used as a contineous variable")
+    }
+  }
+  
+data %>%
   group_by(.ci, .ri) %>%
   do(do.anova(.)) %>%
   ctx$addNamespace() %>%
