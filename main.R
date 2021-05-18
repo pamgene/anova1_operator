@@ -1,17 +1,20 @@
 library(tercen)
 library(dplyr)
 
-do.anova = function(df){
+do.anova = function(df) {
   result   <- NULL
   pFactor1 <- NaN
   aLm = try(lm(.y ~ .group.colors, data=df), silent = TRUE)
-  if(!inherits(aLm, 'try-error')) {
+  if (!inherits(aLm, 'try-error')) {
     pFactor1 <- (anova(aLm)$'Pr(>F)')[[1]]
   }
   
-  if (is.numeric(df$.group.colors)){
-    slope     <- as.vector(coefficients(aLm))[2]
-    intercept <- as.vector(coefficients(aLm))[1]
+  if (is.numeric(df$.group.colors)) {
+    slope <- intercept <- NaN
+    if (!inherits(aLm, 'try-error')) {
+      slope     <- as.vector(coefficients(aLm))[2]
+      intercept <- as.vector(coefficients(aLm))[1]
+    }
     result <- data.frame(.ri = df$.ri[1], .ci = df$.ci[1], pFactor1 = pFactor1, logPfactor1 = -log10(pFactor1), slope = slope, intercept = intercept)
   } else {
     result <- data.frame(.ri = df$.ri[1], .ci = df$.ci[1], pFactor1 = pFactor1, logPfactor1 = -log10(pFactor1))
