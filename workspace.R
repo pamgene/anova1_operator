@@ -34,7 +34,7 @@ groupingType = ifelse(is.null(ctx$op.value('Grouping Variable')), 'categorical',
 
 data <- ctx %>% 
   select(.ci, .ri, .y) %>%
-  mutate(.group.colors = do.call(function(...) paste(..., sep='.'), ctx$select(ctx$colors)))
+  mutate(.group.colors = ctx$select(ctx$colors) %>% pull())
 
   if (groupingType == 'categorical'){
     data <- data %>% mutate(.group.colors = as.factor(.group.colors))
