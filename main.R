@@ -1,7 +1,7 @@
 library(tercen)
 library(dplyr)
 
-do.anova = function(df, grouping_variable){
+do.anova = function(df){
   result   <- NULL
   pFactor1 <- NaN
   aLm = try(lm(.y ~ .group.colors, data=df), silent = TRUE)

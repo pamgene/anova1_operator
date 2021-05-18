@@ -8,7 +8,7 @@ library(dplyr)
 #options("tercen.username"= "admin")
 #options("tercen.password"= "admin")
 
-do.anova = function(df, grouping_variable){
+do.anova = function(df){
   result   <- NULL
   pFactor1 <- NaN
   aLm = try(lm(.y ~ .group.colors, data=df), silent = TRUE)
