@@ -19,7 +19,7 @@ Output relations|.
 ---|---
 `pFactor1`          | p-value for the probability that all group means are equal (groupingType = categorical) or the slope of the straight line fit is equal to zero                                 (groupingType = continuous). Hence, a low value indicates a significant effect.
 `pFactor1`          | the significance as - 10 log(pFactor1)
-`slope`:            | slope of the regression line. Only if the grouping type is continuous.
+`slope`            | slope of the regression line. Only if the grouping type is continuous.
 `intercept`         | intercept of the regression line. Only if the grouping type is continuous.
 
 ##### Details
